@@ -1,0 +1,107 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+	font-family: 'Roboto', sans-serif;
+	font-display: fallback;
+	line-height: 1.6;
+	height: 100vh;
+	width: 100vw;
+ }
+
+h1 {
+  text-align: center;
+	font-size: 60px;
+	font-weight: bold;
+	margin-bottom: 0px;
+}
+
+h2 {
+  text-align: center;
+	font-size: 30px;
+	font-weight: normal;
+	margin-top: 4px;
+}
+
+h3 {
+	font-size: 20px;
+	margin-bottom: 0px;
+}
+
+em {
+	font-weight: 600;
+	font-style: normal;
+}
+
+.play-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 15px 32px;
+  font-size: 32px;
+  border-radius: 12px
+}
+
+code {
+	font-family: 'Roboto Mono', Courier, monospace;
+	color: #A30038;
+	background-color: #F8F8F8;
+	border: 1px solid #DDD;
+	border-radius: 2px;
+	padding: 0 6px;
+	font-weight: 500;
+}
+
+.cta {
+	padding-bottom: 52px;
+}
+
+.cta a {
+	color: white;
+	text-decoration: none;
+	background-color: rgb(14, 101, 241);
+	padding: 8px 12px;
+	margin: 8px;
+	min-height: 36px;
+	border-radius: 2px;
+	font-weight: 600;
+}
+
+.cta a:hover {
+    background-color: rgb(66, 133, 244, 0.9);
+}
+
+@media (max-width: 600px) {
+    .hero .logo {
+        float: initial;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+	.container {
+        margin-top: 0;
+	}
+
+    .hero {
+        margin-top: 0;
+        margin-bottom: 24px;
+	}
+}
+@media (prefers-color-scheme: dark) {
+    body {
+        background: black url('dark_bg.svg');
+        color:white;
+    }
+	a {
+		color: #8AB4F8;
+	}
+	a:visited {
+		color: #b48af8;
+	}
+	.cta a {
+		color: white;
+	}
+}

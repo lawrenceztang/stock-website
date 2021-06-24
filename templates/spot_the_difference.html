@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<head>
+  <title>Odd One Out</title>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='scripts/spot_the_difference.js') }}"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+
+<body id="body">
+
+  <div id="nav-placeholder"></div>
+
+  <h1>Are stocks actually random?</h1>
+
+  <div class="chart-wrap" style="height: 70%; width: 50%; float: left">
+    <canvas id="chart1"></canvas>
+  </div>
+  <div class="chart-wrap" style="height: 70%; margin-left: 50%; width: 50%">
+    <canvas id="chart2"></canvas>
+  </div>
+
+  <div style="width: 15%; float: left">
+    <h2>Accuracy</h2>
+    <h2 id="accuracy"></h2>
+  </div>
+  <div style="float: left; width: 15%">
+    <h2>P-value</h2>
+    <h2 id="p-value"></h2>
+  </div>
+  <div style="width: 30%; margin-left: 35%; text-align: center">
+    <h2 id="correct"></h2>
+    <h2 id="instructions"></h2>
+  </div>
+</body>
+
+<script type="text/javascript">
+initialize_charts();
+$(function(){
+  $("#nav-placeholder").load("/nav.html");
+});
+</script>

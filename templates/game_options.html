@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<head>
+  <title>Home</title>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='scripts/stock_game.js') }}"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<style>
+
+form {
+  /* Center the form on the page */
+  text-align: center;
+  margin: 0 auto;
+  width: 350px;
+  /* Form outline */
+  padding: 1em;
+  border: 1px solid #CCC;
+  border-radius: 1em;
+}
+
+form li + li {
+  margin-top: 1em;
+}
+
+label {
+  /* Uniform size & alignment */
+  display: inline-block;
+  font-size: 30px;
+}
+
+input,
+textarea {
+  font-size: 25px;
+  text-align: center;
+  font: 1em sans-serif;
+
+  /* Uniform text field size */
+  width: 300px;
+  box-sizing: border-box;
+
+  /* Match form field borders */
+  border: 1px solid #999;
+}
+
+input:focus,
+textarea:focus {
+  /* Additional highlight for focused elements */
+  border-color: #000;
+}
+
+textarea {
+  /* Align multiline text fields with their labels */
+  vertical-align: top;
+
+  /* Provide space to type some text */
+  height: 5em;
+}
+
+</style>
+
+<body>
+
+  <div id="nav-placeholder"></div>
+
+  <script>
+  $(function(){
+    $("#nav-placeholder").load("/nav.html");
+  });
+  </script>
+
+  <div>
+    <h1>Beat the Market</h1>
+    <h2>Do you believe in the old phrase "Buy low, sell high?" Think again. Test out your trading strategies with this simulation that uses real historical data of stock prices. Try to beat the annualized ROI of a buy-and-hold strategy.</h2>
+
+    <form action="stock-sim" method="post">
+      <label for="ticker">Stock Ticker</label><br>
+      <input type="text" id="ticker" name="ticker" value="AMZN"><br>
+      <label for="year">Start Year</label><br>
+      <input type="text" id="year" name="year" value="2010"><br><br>
+      <input class="play-button" type="submit" value="Play">
+    </form>
+  </div>
+
+  <div style="text-align: center">
+    <h1>Odd One Out</h1>
+    <h2>Are changes in stock prices simply random numbers drawn from a normal distribution? See if you can discern the difference between real stock data and randomly generated data.</h2>
+    <a href="/spot-the-difference">
+      <button class="play-button">Play</button>
+    </a>
+  </div>
+
+</body>

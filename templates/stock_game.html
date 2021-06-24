@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<style>
+  body {
+    height: 100vh;
+    width: 100vw;
+  }
+</style>
+
+<head>
+  <title>Beat the Market</title>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='scripts/stock_game.js') }}"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+  <div id="nav-placeholder"></div>
+
+  <h1>Try to beat the market!</h1>
+
+  <div class="chart-container" style="height:70%; width:60%; float: left">
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <div style="width: 40%; float: left">
+
+    <div style="width: 50%; float: left">
+      <h2>Annualized ROI for your strategy</h2>
+      <h2 id="annualized_roi_display"></h2>
+    </div>
+    <div style="float: left; width: 50%">
+      <h2>Annualized ROI for buy-and-hold</h2>
+      <h2 id="hold_annualized_roi_display"></h2>
+    </div>
+
+    <div style="text-align: center">
+      <h2 id="current-price"></h2>
+      <button class="play-button" type="button" id="buy_sell" onclick="buy_sell_toggle()">Buy</button>
+    </div>
+
+  </div>
+
+</body>
+
+<script type="text/javascript">
+run({{ input_from_python | tojson }}, {{ ticker | tojson }});
+$(function(){
+  $("#nav-placeholder").load("/nav.html");
+});
+</script>
