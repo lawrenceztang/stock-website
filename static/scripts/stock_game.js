@@ -1,12 +1,14 @@
 var index = 29;
 var bought_index = -1;
 var money_made = 0;
-var list_data;
+var list_data = [];
 var time_held = 0;
 var roi = 1;
 var annualized_roi = 1;
 var hold_roi = 1;
 var hold_annualized_roi = 1;
+const alpha = alphavantage({ key: 'P82FZXGPGDWO4M1I' });
+var start_index;
 
 function buy_sell_toggle() {
   if(bought_index == -1) {
@@ -27,15 +29,15 @@ function buy_stock() {
 }
 
 function sell_stock() {
-  money_made += list_data[index]["open"] - list_data[bought_index]["open"];
+  money_made += get_open(index) - get_open(bought_index);
   time_held += index - bought_index;
-  roi *= list_data[index]["open"] / list_data[bought_index]["open"];
+  roi *= get_open(index) / get_open(bought_index);
   annualized_roi = Math.pow(roi, 1 / (time_held / 365)) - 1;
   bought_index = -1;
 }
 
 function update_hold_roi() {
-  hold_roi = (list_data[index]["open"] - list_data[0]["open"]) / list_data[0]["open"];
+  hold_roi = (get_open(index) - get_open(0)) / get_open(0);
   hold_annualized_roi = Math.pow(1 + hold_roi, 1 / (index / 365)) - 1;
 }
 
@@ -44,49 +46,83 @@ function display_hold_roi() {
 }
 
 function display_current_price() {
-  document.getElementById("current-price").innerHTML = Math.round(list_data[index]["open"] * 100) / 100;
+  document.getElementById("current-price").innerHTML = Math.round(get_open(index) * 100) / 100;
 }
 
-function run(in_data, ticker) {
-  list_data = in_data;
-  const labels = [];
-  const data = {
-    labels: labels,
-    datasets: [{
-      label: 'Price of ' + ticker,
-      backgroundColor: 'rgb(255, 99, 132)',
-      borderColor: 'rgb(255, 99, 132)',
-      data: [],
-    }]
-  };
+function get_date(index) {
+  return list_data[start_index - index][0];
+}
 
-  const config = {
-    type: 'line',
-    data,
-    options: {responsive:true,
-              maintainAspectRatio: false}
-  };
+function get_open(index) {
+  return list_data[start_index - index][1];
+}
 
-  var myChart = new Chart(
-    document.getElementById('myChart'),
-    config
-  );
+function get_start_index(date) {
+  for(var i = 0; i < list_data.length; i++) {
+    if(date > parseInt(list_data[i][0].split(" "))) {
+      return i;
+    }
+  }
+  return -1;
+}
 
-  setInterval(function() {
-    index++;
-    x = []
-    y = []
-    for(let j = index - 29; j <= index; j++) {
-      x.push(list_data[j]["open"]);
-      y.push(list_data[j]["date"]);
+function done() {
+
+}
+
+function run(ticker, date) {
+  alpha.data.daily(ticker, "full", "json", 1).then((d) => {
+
+    for(var key in d["Time Series (Daily)"]) {
+      list_data.push([key, d["Time Series (Daily)"][key]["1. open"]]);
     }
 
-    myChart.data.datasets[0].data = x;
-    myChart.data.labels = y;
-    myChart.update();
+    const labels = [];
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: 'Price of ' + ticker,
+        backgroundColor: 'rgb(255, 99, 132)',
+        borderColor: 'rgb(255, 99, 132)',
+        data: [],
+      }]
+    };
 
-    update_hold_roi();
-    display_hold_roi();
-    display_current_price();
-  }, 1000);
+    const config = {
+      type: 'line',
+      data,
+      options: {responsive:true,
+                maintainAspectRatio: false}
+    };
+
+    var myChart = new Chart(
+      document.getElementById('myChart'),
+      config
+    );
+
+    start_index = get_start_index(date);
+
+    setInterval(function() {
+      index++;
+
+      if(index + 30 >= list_data.length) {
+        done();
+      }
+
+      x = []
+      y = []
+      for(let j = index - 29; j <= index; j++) {
+        x.push(get_open(j));
+        y.push(get_date(j));
+      }
+
+      myChart.data.datasets[0].data = x;
+      myChart.data.labels = y;
+      myChart.update();
+
+      update_hold_roi();
+      display_hold_roi();
+      display_current_price();
+    }, 1000);
+  });
 }

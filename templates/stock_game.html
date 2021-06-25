@@ -9,6 +9,7 @@
 
 <head>
   <title>Beat the Market</title>
+  <script type="text/javascript" src="{{ url_for('static', filename='scripts/alphavantage/dist/bundle.js') }}"></script>
   <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='scripts/stock_game.js') }}"></script>
@@ -46,7 +47,7 @@
 </body>
 
 <script type="text/javascript">
-run({{ input_from_python | tojson }}, {{ ticker | tojson }});
+run({{ ticker | tojson }}, {{ date | tojson }});
 $(function(){
   $("#nav-placeholder").load("/nav.html");
 });
