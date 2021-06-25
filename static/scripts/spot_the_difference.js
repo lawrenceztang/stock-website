@@ -3,7 +3,6 @@ var num_done = 0;
 var num_correct = 0;
 var chart_1;
 var chart_2;
-const alpha = alphavantage({ key: 'P82FZXGPGDWO4M1I' });
 
 function initialize_chart(id, label) {
     const labels = Array(30).fill().map((element, index) => index + 1);
@@ -37,19 +36,17 @@ function initialize_charts() {
   reset();
 }
 
-function fill_charts(data) {
+function fill_charts(real, fake) {
   if(Math.random() > .5) {
-    chart_1.data.datasets[0].data = data[1];
-    chart_2.data.datasets[0].data = data[0];
+    chart_1.data.datasets[0].data = fake;
+    chart_2.data.datasets[0].data = real;
     correct = "right";
   }
   else {
-    chart_1.data.datasets[0].data = data[0];
-    chart_2.data.datasets[0].data = data[1];
+    chart_1.data.datasets[0].data = real;
+    chart_2.data.datasets[0].data = fake;
     correct = "left";
   }
-  chart_1.data.labels = data[2];
-  chart_2.data.labels = data[2];
   chart_1.update();
   chart_2.update();
 }
@@ -101,80 +98,22 @@ function select_right() {
   answer_chosen();
 }
 
-function random_ticker() {
-  var http = new XMLHttpRequest();
-  http.open("GET", "https://cloud.iexapis.com/stable/ref-data/symbols?token=pk_7ca0abb335474d08baeddfba070af8e3", true);
-  http.responseType = "json";
-  http.onload = function() { 
-    get_data(http.response[Math.floor(Math.random() * http.response.length)]["symbol"]);
-  };
-  http.send(null);
-}
-
-function gaussian() {
-  var u = 0, v = 0;
-  while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-  while(v === 0) v = Math.random();
-  return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
-}
-
-function random_data(start_price, avg_percent_change, std_percent_change) {
-  out = [start_price];
-  for(var i = 1; i < 30; i++) {
-    out.push(out[i - 1] + out[i - 1] * (gaussian() * std_percent_change + avg_percent_change));
-  }
-  return out;
-}
-
-function get_percent_deltas(data) {
-  var out = [];
-  for(var i = 1; i < data.length; i++) {
-    out.push((data[i] - data[i - 1]) / data[i - 1]);
-  }
-  return out;
-}
-
-function mean(array) {
-  const n = array.length;
-  const mean = array.reduce((a, b) => a + b) / n;
-  return mean;
-}
-
-function std (array) {
-  const n = array.length
-  const mean = array.reduce((a, b) => a + b) / n
-  return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n)
-}
-
-function get_data(ticker) {
-  alpha.data.daily(ticker, "full", "json", 1).then((d) => {
-    var length = Object.keys(d["Time Series (Daily)"]).length;
-    var start_index = Math.floor(Math.random() * (length - 31));
-    var count = 0;
-    var real_data = [];
-    var dates = []
-    for(var key in d["Time Series (Daily)"]) {
-      if(count >= start_index + 30) {
-        date = key;
-        break;
-      }
-      if(count >= start_index) {
-        dates.unshift(key);
-        real_data.unshift(parseInt(d["Time Series (Daily)"][key]["1. open"]));
-      }
-      count++;
-    }
-    var percent_deltas = get_percent_deltas(real_data);
-    fill_charts([real_data, random_data(real_data[0], mean(percent_deltas), std(percent_deltas)), dates]);
+function get_data() {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "/get-real-fake-data", true);
+  xhr.responseType = "json";
+  xhr.onload = function() {
+    fill_charts(xhr.response[2], xhr.response[3]);
     document.getElementById("chart1").addEventListener("click", select_left);
     document.getElementById("chart2").addEventListener("click", select_right);
-    document.getElementById("correct").innerHTML = (ticker);
-  });
-
+    document.getElementById("correct").innerHTML = (xhr.response[0] + ", " + xhr.response[1]);
+  };
+  xhr.send();
 }
+
 function reset() {
   document.body.style.backgroundColor = "white";
-  random_ticker();
+  get_data();
   document.getElementById("body").removeEventListener("click", reset);
   document.getElementById("instructions").innerHTML = "Select the real stock graph";
 }

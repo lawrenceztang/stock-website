@@ -47,7 +47,7 @@
 </body>
 
 <script type="text/javascript">
-run({{ ticker | tojson }}, {{ date | tojson }});
+run({{ ticker | tojson }}, {{ date | tojson }}, {{interval | tojson}});
 $(function(){
   $("#nav-placeholder").load("/nav.html");
 });

@@ -63,66 +63,79 @@ function get_start_index(date) {
       return i;
     }
   }
-  return -1;
+  return list_data.length - 30;
 }
 
 function done() {
 
 }
 
-function run(ticker, date) {
-  alpha.data.daily(ticker, "full", "json", 1).then((d) => {
+function run(ticker, date, interval) {
+  if(interval == "(Daily)") {
+    alpha.data.daily(ticker, "full", "json", 1).then((d) => {
+      play(ticker, date, d, interval);
+    });
+  }
+  else if(interval == "(5min)") {
+    alpha.data.intraday(ticker, "full", "json", "5min").then((d) => {
+      play(ticker, date, d, interval);
+    });
+  }
 
-    for(var key in d["Time Series (Daily)"]) {
-      list_data.push([key, d["Time Series (Daily)"][key]["1. open"]]);
+}
+
+function play(ticker, date, d, interval) {
+
+  for(var key in d["Time Series " + interval]) {
+    list_data.push([key, d["Time Series " + interval][key]["1. open"]]);
+  }
+  console.log(list_data);
+
+  const labels = [];
+  const data = {
+    labels: labels,
+    datasets: [{
+      label: 'Price of ' + ticker,
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: [],
+    }]
+  };
+
+  const config = {
+    type: 'line',
+    data,
+    options: {responsive:true,
+              maintainAspectRatio: false}
+  };
+
+  var myChart = new Chart(
+    document.getElementById('myChart'),
+    config
+  );
+
+  start_index = get_start_index(date);
+
+  setInterval(function() {
+    index++;
+
+    if(index + 30 >= list_data.length) {
+      done();
     }
 
-    const labels = [];
-    const data = {
-      labels: labels,
-      datasets: [{
-        label: 'Price of ' + ticker,
-        backgroundColor: 'rgb(255, 99, 132)',
-        borderColor: 'rgb(255, 99, 132)',
-        data: [],
-      }]
-    };
+    x = []
+    y = []
+    for(let j = index - 29; j <= index; j++) {
+      x.push(get_open(j));
+      y.push(get_date(j));
+    }
 
-    const config = {
-      type: 'line',
-      data,
-      options: {responsive:true,
-                maintainAspectRatio: false}
-    };
+    myChart.data.datasets[0].data = x;
+    myChart.data.labels = y;
+    myChart.update();
 
-    var myChart = new Chart(
-      document.getElementById('myChart'),
-      config
-    );
-
-    start_index = get_start_index(date);
-
-    setInterval(function() {
-      index++;
-
-      if(index + 30 >= list_data.length) {
-        done();
-      }
-
-      x = []
-      y = []
-      for(let j = index - 29; j <= index; j++) {
-        x.push(get_open(j));
-        y.push(get_date(j));
-      }
-
-      myChart.data.datasets[0].data = x;
-      myChart.data.labels = y;
-      myChart.update();
-
-      update_hold_roi();
-      display_hold_roi();
-      display_current_price();
-    }, 1000);
-  });
+    update_hold_roi();
+    display_hold_roi();
+    display_current_price();
+  }, 1000);
 }
