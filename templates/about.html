@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<head>
+    <title>About</title>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <link rel="stylesheet" href="/static/paragraph_style.css">
+</head>
+
+<div id="nav-placeholder"></div>
+
+<script>
+$(function(){
+  $("#nav-placeholder").load("/nav.html");
+});
+</script>
+
+<body>
+    <div class="main-div">
+        <h1>About</h1>
+        <h2>Beat the Market</h2>
+        <p>I made Beat the Market because I was curious if analyzing charts of stock prices is actually any use to investors. I've heard the saying "buy low, sell high" for as long as I can remember, but is it actually any use in the market? To test this out, I made this simulation. The advantage of using historical data is that you can skip forward in time without having to wait. The simulation only has a buy and sell option for the stock of a single company to simplify things; I wanted to eliminate other variables that would complicate things. The data is real historical market data obtained using the AlphaVantage API. </p>
+        <h3>Annualized ROI</h3>
+        <p>The goal of the simulation is to beat the annualized ROI of a buy-and-hold strategy. In simple terms, the annualized ROI represents the amount of money you make per unit of time your money is invested. The reasoning behind this metric is that you shouldn't be penalized for not being invested in the stock because your money then be put to use elsewhere.</p>
+
+        <h2>Odd one Out</h2>
+        <p>Thinking along similar lines as when I made Beat the Market, I wanted to see if the change in stock prices from day to day were simply random numbers drawn from a Gaussian distribution. If so, this would prove the theory that analyzing stock prices is futile. Thus, this simulation compares graphs of actual stock prices to graphs of a fake stock with changes in prices drawn from a Gaussian distribution. A key thing to note is that even if real stock prices aren't drawn from a Gaussian distribution (if real stock graphs can be distinguished from the fake ones), that doesn't mean that future stock prices can be predicted by analyzing graphs. Stock prices could still be random, just not drawn from a Gaussian distribution.</p>
+    </div>
+</body>

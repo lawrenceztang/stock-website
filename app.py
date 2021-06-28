@@ -68,5 +68,13 @@ def stock_sim():
     #check is valid - TODO
     return render_template("stock_game.html", ticker=ticker, date=year, interval=interval)
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+@app.route("/test-page")
+def test_page():
+    return render_template("test.html")
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

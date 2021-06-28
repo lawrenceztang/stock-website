@@ -9,6 +9,7 @@ var hold_roi = 1;
 var hold_annualized_roi = 1;
 const alpha = alphavantage({ key: 'P82FZXGPGDWO4M1I' });
 var start_index;
+var myChart;
 
 function buy_sell_toggle() {
   if(bought_index == -1) {
@@ -26,6 +27,7 @@ function buy_sell_toggle() {
 
 function buy_stock() {
   bought_index = index;
+  myChart.data.datasets[0].backgroundColor[29] = 'rgb(0, 255, 0)';
 }
 
 function sell_stock() {
@@ -34,6 +36,7 @@ function sell_stock() {
   roi *= get_open(index) / get_open(bought_index);
   annualized_roi = Math.pow(roi, 1 / (time_held / 365)) - 1;
   bought_index = -1;
+  myChart.data.datasets[0].backgroundColor[29] = 'rgb(255, 0, 0)';
 }
 
 function update_hold_roi() {
@@ -81,7 +84,6 @@ function run(ticker, date, interval) {
       play(ticker, date, d, interval);
     });
   }
-
 }
 
 function play(ticker, date, d, interval) {
@@ -96,8 +98,8 @@ function play(ticker, date, d, interval) {
     labels: labels,
     datasets: [{
       label: 'Price of ' + ticker,
-      backgroundColor: 'rgb(255, 99, 132)',
-      borderColor: 'rgb(255, 99, 132)',
+      backgroundColor: [],
+      borderColor: 'rgb(191, 209, 214)', 
       data: [],
     }]
   };
@@ -109,12 +111,17 @@ function play(ticker, date, d, interval) {
               maintainAspectRatio: false}
   };
 
-  var myChart = new Chart(
+  myChart = new Chart(
     document.getElementById('myChart'),
     config
   );
 
   start_index = get_start_index(date);
+
+  var count = 30;
+  while(count--) {
+    myChart.data.datasets[0].backgroundColor.push('rgb(0, 0, 255)');
+  }
 
   setInterval(function() {
     index++;
@@ -129,6 +136,9 @@ function play(ticker, date, d, interval) {
       x.push(get_open(j));
       y.push(get_date(j));
     }
+
+    myChart.data.datasets[0].backgroundColor.shift();
+    myChart.data.datasets[0].backgroundColor.push('rgb(0, 0, 255)');
 
     myChart.data.datasets[0].data = x;
     myChart.data.labels = y;
