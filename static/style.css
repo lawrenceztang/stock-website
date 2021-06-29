@@ -45,7 +45,8 @@ em {
   color: white;
   padding: 15px 32px;
   font-size: 32px;
-  border-radius: 12px
+  border-radius: 12px;
+  text-align: center;
 }
 
 code {

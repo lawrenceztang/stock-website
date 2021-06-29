@@ -22,16 +22,19 @@
 
   <h1>Try to beat the market!</h1>
 
-  <div class="chart-container" style="height:70%; width:60%; float: left">
+  <div class="chart-container" style="height:70%; width:60%; float: left; text-align: center;">
     <canvas id="myChart"></canvas>
-    <button class="play-button" type="button" id="pause_play" onclick="pause_play_toggle()"></button>
+    <button class="play-button" type="button" onclick="pause_play_toggle()" id="pause_play">
+      &#9612 &#9612
+    </button>
+    <button class="play-button" type="button" id="step" onclick="step()">&#9658&#9658</button>
   </div>
 
   <div style="width: 40%; float: left">
 
     <div style="width: 50%; float: left">
       <h2>Annualized ROI for your strategy</h2>
-      <h2 id="annualized_roi_display"></h2>
+      <h2 id="annualized_roi_display">NA</h2>
     </div>
     <div style="float: left; width: 50%">
       <h2>Annualized ROI for buy-and-hold</h2>

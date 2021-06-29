@@ -1,3 +1,4 @@
+var NUM_POINTS = 30;
 var index = 29;
 var bought_index = -1;
 var money_made = 0;
@@ -8,8 +9,25 @@ var annualized_roi = 1;
 var hold_roi = 1;
 var hold_annualized_roi = 1;
 const alpha = alphavantage({ key: 'P82FZXGPGDWO4M1I' });
-var start_index;
+var start_index = 29;
 var myChart;
+var interval;
+var playing = true;
+var interval_timer;
+
+var divisor = {"(Daily)": 365, "(5min)": 105120};
+
+function pause_play_toggle() {
+  playing = !playing;
+  if(playing) {
+    document.getElementById("pause_play").innerHTML = "&#9612 &#9612";
+    interval_timer = setInterval(step, 1000);
+  }
+  else {
+    document.getElementById("pause_play").innerHTML = "&#9658";
+    clearInterval(interval_timer);
+  }
+}
 
 function buy_sell_toggle() {
   if(bought_index == -1) {
@@ -33,15 +51,18 @@ function buy_stock() {
 function sell_stock() {
   money_made += get_open(index) - get_open(bought_index);
   time_held += index - bought_index;
+
   roi *= get_open(index) / get_open(bought_index);
-  annualized_roi = Math.pow(roi, 1 / (time_held / 365)) - 1;
+  annualized_roi = Math.pow(roi, 1 / (time_held / divisor[interval])) - 1;
+
   bought_index = -1;
   myChart.data.datasets[0].backgroundColor[29] = 'rgb(255, 0, 0)';
 }
 
 function update_hold_roi() {
-  hold_roi = (get_open(index) - get_open(0)) / get_open(0);
-  hold_annualized_roi = Math.pow(1 + hold_roi, 1 / (index / 365)) - 1;
+
+  hold_roi = (get_open(index) - get_open(29)) / get_open(29);
+  hold_annualized_roi = Math.pow(1 + hold_roi, 1 / ((index - 29) / divisor[interval])) - 1;
 }
 
 function display_hold_roi() {
@@ -73,23 +94,24 @@ function done() {
 
 }
 
-function run(ticker, date, interval) {
+function run(ticker, date, inter) {
+  interval = inter;
   if(interval == "(Daily)") {
     alpha.data.daily(ticker, "full", "json", 1).then((d) => {
-      play(ticker, date, d, interval);
+      play(ticker, date, d);
     });
   }
   else if(interval == "(5min)") {
     alpha.data.intraday(ticker, "full", "json", "5min").then((d) => {
-      play(ticker, date, d, interval);
+      play(ticker, date, d);
     });
   }
 }
 
-function play(ticker, date, d, interval) {
+function play(ticker, date, d) {
 
   for(var key in d["Time Series " + interval]) {
-    list_data.push([key, d["Time Series " + interval][key]["1. open"]]);
+    list_data.push([key, d["Time Series " + interval][key]["4. close"]]);
   }
   console.log(list_data);
 
@@ -123,29 +145,31 @@ function play(ticker, date, d, interval) {
     myChart.data.datasets[0].backgroundColor.push('rgb(0, 0, 255)');
   }
 
-  setInterval(function() {
-    index++;
+  interval_timer = setInterval(step, 1000);
+}
 
-    if(index + 30 >= list_data.length) {
-      done();
-    }
+function step() {
+  index++;
 
-    x = []
-    y = []
-    for(let j = index - 29; j <= index; j++) {
-      x.push(get_open(j));
-      y.push(get_date(j));
-    }
+  if(index + 30 >= list_data.length) {
+    done();
+  }
 
-    myChart.data.datasets[0].backgroundColor.shift();
-    myChart.data.datasets[0].backgroundColor.push('rgb(0, 0, 255)');
+  x = []
+  y = []
+  for(let j = index - 29; j <= index; j++) {
+    x.push(get_open(j));
+    y.push(get_date(j));
+  }
 
-    myChart.data.datasets[0].data = x;
-    myChart.data.labels = y;
-    myChart.update();
+  myChart.data.datasets[0].backgroundColor.shift();
+  myChart.data.datasets[0].backgroundColor.push('rgb(0, 0, 255)');
 
-    update_hold_roi();
-    display_hold_roi();
-    display_current_price();
-  }, 1000);
+  myChart.data.datasets[0].data = x;
+  myChart.data.labels = y;
+  myChart.update();
+
+  update_hold_roi(interval);
+  display_hold_roi();
+  display_current_price();
 }
