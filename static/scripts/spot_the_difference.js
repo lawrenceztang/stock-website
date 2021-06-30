@@ -71,7 +71,7 @@ function answer_chosen() {
   document.getElementById("accuracy").innerHTML = num_correct + "/" + num_done + " (" + Math.round(num_correct / num_done * 100 * 100) / 100 + "%)";
   document.getElementById("chart1").removeEventListener("click", select_left);
   document.getElementById("chart2").removeEventListener("click", select_right);
-  setTimeout(display_continue, 500);
+  setTimeout(display_continue, 200);
 }
 
 function select_left() {

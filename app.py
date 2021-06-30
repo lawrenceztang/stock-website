@@ -64,9 +64,10 @@ def stock_sim():
     ticker = request.form["ticker"]
     year = request.form["year"]
     interval = request.form["interval"]
+    algorithm = request.form["algorithm"]
     print(request.form, file=sys.stderr)
     #check is valid - TODO
-    return render_template("stock_game.html", ticker=ticker, date=year, interval=interval)
+    return render_template("stock_game.html", ticker=ticker, date=year, interval=interval, algorithm=algorithm)
 
 @app.route("/about")
 def about():

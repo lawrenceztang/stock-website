@@ -4,8 +4,6 @@ body {
   padding: 0;
 }
 
-
-
 body {
 	font-family: 'Roboto', sans-serif;
 	font-display: fallback;
@@ -41,6 +39,7 @@ em {
 }
 
 .play-button {
+  margin: 5px;
   background-color: #4CAF50;
   color: white;
   padding: 15px 32px;

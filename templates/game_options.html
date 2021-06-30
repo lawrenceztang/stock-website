@@ -33,6 +33,7 @@ label {
 }
 
 input,
+select,
 textarea {
   font-size: 25px;
   text-align: center;
@@ -78,13 +79,19 @@ textarea {
 
     <form action="stock-sim" method="post">
       <label for="ticker">Stock Ticker</label><br>
-      <input type="text" id="ticker" name="ticker" value="AMZN"><br>
+      <input type="text" id="ticker" name="ticker" value="AMZN">
       <label for="year">Start Year</label><br>
-      <input type="text" id="year" name="year" value="2010"><br><br>
-      <label for="Interval">Interval</label><br>
+      <input type="text" id="year" name="year" value="2010">
+      <label for="Interval">Interval</label>
       <select name="interval">
         <option value="(5min)">5 Minutes</option>
         <option value="(Daily)">Daily</option>
+      </select>
+      <label for="Algorithm">Algorithm</label><br>
+      <select name="algorithm">
+        <option value="none">None</option>
+        <option value="dip">Dip</option>
+        <option value="rise">Rise</option>
       </select>
       <input class="play-button" type="submit" value="Play">
     </form>

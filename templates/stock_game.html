@@ -13,6 +13,7 @@
   <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='scripts/stock_game.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='scripts/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js') }}"></script>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 
@@ -28,17 +29,31 @@
       &#9612 &#9612
     </button>
     <button class="play-button" type="button" id="step" onclick="step()">&#9658&#9658</button>
+    <button class="play-button" type="button" id="skip" onclick="skip()">Skip to end</button>
   </div>
 
   <div style="width: 40%; float: left">
 
-    <div style="width: 50%; float: left">
-      <h2>Annualized ROI for your strategy</h2>
-      <h2 id="annualized_roi_display">NA</h2>
+    <div style="display:inline-block; width: 100%">
+      <div style="width: 50%; float: left">
+        <h2>ROI</h2>
+        <h2 id="roi_display">NA</h2>
+      </div>
+      <div style="float: left; width: 50%">
+        <h2>Time Held</h2>
+        <h2 id="time_held_display"></h2>
+      </div>
     </div>
-    <div style="float: left; width: 50%">
-      <h2>Annualized ROI for buy-and-hold</h2>
-      <h2 id="hold_annualized_roi_display"></h2>
+
+    <div style="display:inline-block; width: 100%">
+      <div style="width: 50%; float: left">
+        <h2>Annualized ROI for your strategy</h2>
+        <h2 id="annualized_roi_display">NA</h2>
+      </div>
+      <div style="float: left; width: 50%">
+        <h2>Annualized ROI for buy-and-hold</h2>
+        <h2 id="hold_annualized_roi_display"></h2>
+      </div>
     </div>
 
     <div style="text-align: center">
@@ -51,7 +66,7 @@
 </body>
 
 <script type="text/javascript">
-run({{ ticker | tojson }}, {{ date | tojson }}, {{interval | tojson}});
+run({{ ticker | tojson }}, {{ date | tojson }}, {{interval | tojson}}, {{algorithm | tojson}});
 $(function(){
   $("#nav-placeholder").load("/nav.html");
 });
