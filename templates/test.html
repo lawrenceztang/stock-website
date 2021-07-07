@@ -1,17 +1,48 @@
-<head>
-    <title>Home</title>
-    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/static/style.css">
-  </head>  
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/scripts/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
+
+<canvas id="myChart" width="400" height="400"></canvas>
+
+<script>
+
+var chart = new Chart(document.getElementById("myChart"), {
+   type: 'line',
+   data: {
+      labels: ['2017-08-02', '2017-08-05', '2017-08-09', '2017-08-12', '2017-08-14'],
+      datasets: [{
+         label: 'LINE',
+         data: [3, 1, 4, 2, 5],
+         backgroundColor: 'rgba(0, 119, 290, 0.2)',
+         borderColor: 'rgba(0, 119, 290, 0.6)'
+      }]
+   },
+
+   options: {
+  plugins: {
+    autocolors: false,
+    annotation: {
+      annotations: {
+        line1: {
+          type: 'line',
+          xMin: "2017-08-02",
+          xMax: "2017-08-02",
+          borderColor: 'rgb(255, 99, 132)',
+          borderWidth: 2,
+          label: {content: "Bought", enabled: true}
+        },
+        line2: {
+          type: 'line',
+          xMin: "2017-08-05",
+          xMax: "2017-08-05",
+          borderColor: 'rgb(255, 99, 132)',
+          borderWidth: 2,
+        }
+      }
+    }
+  }
+}
+});
+
+</script>
 
 
-<div style="background: gold";>Hi</div>
-<div style="background: green";>Hi</div>
-<div style="background: gold">
-ss
-</div>
-
-  <div style="text-align: center; background: gray;">
-    <h1 style="padding: 0; margin: 0;">Odd One Out</h1>
-  </div>

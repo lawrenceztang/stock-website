@@ -1,6 +1,8 @@
 var NUM_POINTS = 30;
 var index = 29;
 var bought = false;
+var bought_indexes = [];
+var sold_indexes = [];
 var money_made = 0;
 var list_data = [];
 var time_held = .001;
@@ -23,10 +25,28 @@ var mean_change_hold;
 
 var divisor = {"(Daily)": 365, "(5min)": 105120};
 
-var algo_dict = {"none": "none", "dip": dip_algorithm, "rise": rise_algorithm};
+var algo_dict = {"none": "none", "dip": dip_algorithm, "rise": rise_algorithm, "support": support_resistance_algorithm};
+
+function sma(n) {
+  var sum = 0;
+  for(var i = index - n + 1; i <= index; i++) {
+    sum += get_price(i);
+  }
+  sum /= n;
+  return sum;
+}
+
+function support_resistance_algorithm() {
+  if(get_price(index) < sma(30)) {
+    buy_stock();
+  }
+  if(get_price(index) > sma(30)) {
+    sell_stock();
+  }
+}
 
 function dip_algorithm() {
-  if(get_open(index) < get_open(index - 1)) {
+  if(get_price(index) < get_price(index - 1)) {
     buy_stock();
   }
   else {
@@ -35,7 +55,7 @@ function dip_algorithm() {
 }
 
 function rise_algorithm() {
-  if(get_open(index) > get_open(index - 1)) {
+  if(get_price(index) > get_price(index - 1)) {
     buy_stock();
   }
   else {
@@ -74,33 +94,43 @@ function skip() {
 }
 
 function buy_stock() {
-  bought = true;
-  if(display) {
-    document.getElementById("buy_sell").style.backgroundColor = "red";
-    document.getElementById("buy_sell").innerHTML = "Sell";
+  if(!bought) {
+    bought = true;
+    bought_indexes.push(index);
+    if(display) {
+      display_annotations();
+      document.getElementById("buy_sell").style.backgroundColor = "red";
+      document.getElementById("buy_sell").innerHTML = "Sell";
+      myChart.update();
+    }
   }
 }
 
 function sell_stock() {
-  bought = false;
-  if(display) {
-    document.getElementById("buy_sell").style.backgroundColor = "green";
-    document.getElementById("buy_sell").innerHTML = "Buy";
+  if(bought) {
+    bought = false;
+    sold_indexes.push(index);
+    if(display) {
+      display_annotations();
+      document.getElementById("buy_sell").style.backgroundColor = "green";
+      document.getElementById("buy_sell").innerHTML = "Buy";
+      myChart.update();
+    }
   }
 }
 
 function update_roi() {
   if(bought) {
-    money_made += get_open(index) - get_open(index - 1);
+    money_made += get_price(index) - get_price(index - 1);
     time_held++;
 
-    roi *= get_open(index) / get_open(index - 1);
+    roi *= get_price(index) / get_price(index - 1);
     annualized_roi = Math.pow(roi, 1 / (time_held / divisor[interval])) - 1;
   }
 }
 
 function update_hold_roi() {
-  hold_roi = (get_open(index) - get_open(29)) / get_open(29);
+  hold_roi = (get_price(index) - get_price(29)) / get_price(29);
   hold_annualized_roi = Math.pow(1 + hold_roi, 1 / ((index - 29) / divisor[interval])) - 1;
 }
 
@@ -138,7 +168,7 @@ function display_hold_roi() {
 }
 
 function display_current_price() {
-  document.getElementById("current-price").innerHTML = Math.round(get_open(index) * 100) / 100;
+  document.getElementById("current-price").innerHTML = Math.round(get_price(index) * 100) / 100;
 }
 
 function display_time_held() {
@@ -149,12 +179,45 @@ function display_roi() {
   document.getElementById("roi_display").innerHTML = Math.round((roi - 1) * 100 * 100) / 100 + "%";
 }
 
+function display_annotations() {
+  var annotations = {};
+  for(const index of bought_indexes) {
+    if(myChart.data.labels.includes(get_date(index))) {
+      annotations[index] = 
+      {
+        type: 'line',
+        xMin: get_date(index),
+        xMax: get_date(index),
+        borderColor: 'rgba(150, 200, 150, .8)',
+        borderWidth: 2,
+        label: {content: "Bought", enabled: true, backgroundColor: 'rgba(150, 200, 150, .8)'}
+      };
+    }
+ }
+
+ for(const index of sold_indexes) {
+  if(myChart.data.labels.includes(get_date(index))) {
+    annotations[index] = 
+    {
+      type: 'line',
+      xMin: get_date(index),
+      xMax: get_date(index),
+      borderColor: 'rgba(200, 150, 150, .8)',
+      borderWidth: 2,
+      label: {content: "Sold", enabled: true, backgroundColor: 'rgba(200, 150, 150, .8)'}
+    };
+  }
+}
+
+ myChart.config.options.plugins.annotation.annotations = annotations;
+}
+
 function get_date(index) {
   return list_data[start_index - index][0];
 }
 
-function get_open(index) {
-  return list_data[start_index - index][1];
+function get_price(index) {
+  return parseFloat(list_data[start_index - index][1]);
 }
 
 function get_start_index(date) {
@@ -199,7 +262,7 @@ function play(ticker, date, d) {
     datasets: [{
       label: 'Price of ' + ticker,
       backgroundColor: [],
-      borderColor: 'rgb(191, 209, 214)', 
+      borderColor: 'rgb(150, 150, 214)', 
       data: [],
     }]
   };
@@ -207,10 +270,20 @@ function play(ticker, date, d) {
   const config = {
     type: 'line',
     data,
-    options: {responsive:true,
-              maintainAspectRatio: false,
-              animations: false,
-              elements: {point: {radius: 1}}}
+    options: 
+      {
+        responsive:true,
+        maintainAspectRatio: false,
+        animations: false,
+        elements: {point: {radius: 1}},
+
+        plugins: {
+          annotation: {
+            drawTime: "afterDatasetsDraw",
+            annotations: {}
+          }
+        }
+      }
   };
 
   myChart = new Chart(
@@ -228,16 +301,18 @@ function play(ticker, date, d) {
   interval_timer = setInterval(step, 1000);
 }
 
+
 function update_display() {
   x = []
   y = []
   for(let j = index - 29; j <= index; j++) {
-    x.push(get_open(j));
+    x.push(get_price(j));
     y.push(get_date(j));
   }
 
   myChart.data.datasets[0].data = x;
   myChart.data.labels = y;
+  display_annotations();
   myChart.update();
 
   display_hold_roi();
